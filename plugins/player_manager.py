@@ -603,6 +603,12 @@ class PlayerManager(SimpleCommandPlugin):
             self.players_online.remove(player.uuid)
             return
         try:
+            world_stop_packet = build_packet(packets["world_stop"],
+                                             WorldStop.build(
+                                                 dict(reason=reason)
+                                             ))
+            self.background(player.connection.raw_write(world_stop_packet))
+            
             kick_packet = build_packet(packets["server_disconnect"],
                                        ServerDisconnect.build(
                                            dict(reason=reason)))
@@ -955,8 +961,7 @@ class PlayerManager(SimpleCommandPlugin):
         :return: Null.
         """
 
-        # FIXME: Kick is currently broken. Kicking someone will cause their
-        # starbound client to crash (overkill).
+        # FIXED: NO MORE CRASHES
         try:
             alias = data[0]
         except IndexError:
